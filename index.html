@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Currency Convertor</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"
+        integrity="sha512-Evv84Mr4kqVGRNSgIGL/F/aIDqQb7xQ2vcrdIwxfjThSH8CSR7PBEakCr51Ck+w+/U6swU2Im1vVX0SVk9ABhg=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+    <style>
+        .container {
+            height: 80vh;
+            position: absolute;
+            top: 50%;
+            right: 50%;
+            transform: translate(50%, -50%);
+        }
+
+        form {
+            height: 100%;
+        }
+
+        fieldset {
+            height: 90%;
+            display: flex;
+            border-radius: 10px;
+            justify-content: space-between;
+            flex-direction: column;
+        }
+
+        input {
+            width: 97%;
+            margin: 0 1% 0 0;
+            height: 100%;
+            padding: 0 0 0 2%;
+            font-size: larger;
+            border: 3px double lightgray;
+            outline: none;
+            border-radius: 5px;
+            background: whitesmoke;
+        }
+
+        input:hover {
+            background: none;
+        }
+
+        .main {
+            display: flex;
+            justify-content: space-between;
+            align-content: center;
+        }
+
+        .select_container {
+            height: 100%;
+            background: whitesmoke;
+            width: 100%;
+            padding: 1%;
+            border: 1px double lightgray;
+            border-radius: 5px;
+            text-align: center;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .select_container>select {
+            width: 50%;
+            background: whitesmoke;
+            border: none;
+            outline: none;
+        }
+
+        img {
+            width: 20%;
+        }
+
+        span {
+            width: 100%;
+            height: 100%;
+            font-size: larger;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        #result {
+            text-align: center;
+            font-size: x-large;
+            overflow: auto;
+            min-height: 20%;
+            outline: none;
+        }
+
+        #CRE-btn {
+            height: 15%;
+            outline: none;
+            border: none;
+            border-radius: 10px;
+            font-size: larger;
+            color: whitesmoke;
+            background: linear-gradient(#EE5C2F, #C6272A);
+        }
+
+        #CRE-btn:hover {
+            cursor: pointer;
+            font-weight: bolder;
+            border: 5px double white;
+            background: linear-gradient(90deg, #EE5C2F, #C6272A);
+        }
+
+        @media all and (min-width: 280px) and (max-width:767px) {
+            .container {
+                height: 100%;
+                width: 100%;
+            }
+
+            input {
+                width: 99%;
+                margin: 0 1% 0 0;
+                height: 100%;
+                font-size: larger;
+                border: 3px double lightgray;
+                outline: none;
+                border-radius: 5px;
+                background: whitesmoke;
+            }
+
+            fieldset {
+                justify-content: space-around;
+            }
+
+            input {
+                width: 98%;
+                margin: 0 2% 0 0;
+            }
+
+            #CRE-btn {
+                height: 10%;
+            }
+
+            span>i {
+                font-size: xx-large;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <form action="">
+            <fieldset>
+                <legend>
+                    <h1>Currency Convertor</h1>
+                </legend>
+                <div>
+                    <label for="">Enter Number</label><br>
+                    <input type="number" id="Input-value" placeholder="Write Amount">
+                </div>
+                <div class="main">
+                    <div class="select_container">
+                        <label for="">From</label><br>
+                        <img src="https://flagsapi.com/PK/flat/64.png">
+                        <select name="From" class="Currency-Name">
+                        </select>
+                    </div>
+                    <span><i class="fa-duotone fa-solid fa-repeat"></i></span>
+                    <div class="select_container">
+                        <label for="">To</label><br>
+                        <img src="https://flagsapi.com/KW/flat/64.png">
+                        <select name="To" class="Currency-Name">
+                        </select>
+                    </div>
+                </div>
+                <p id="result" contenteditable="true"></p>
+                <button id="CRE-btn">Currency Exchange Rate </button>
+            </fieldset>
+        </form>
+    </div>
+
+    <script>
+        let flags = 'https://flagsapi.com/PK/flat/64.png';
+        let inputValue = document.querySelector('#Input-value');
+        let currencybtn = document.querySelector('#CRE-btn');
+        let result = document.querySelector('#result');
+        let currencyName = document.querySelectorAll('.Currency-Name');
+        let selectList;
+        const currencyURL = fetch('https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@latest/v1/currencies/usd.json')
+            .then((currency) => currency.json())
+            .then((currency) => {
+                for (let sorted in currency) {
+                    if (typeof (currency[sorted]) == 'object') {
+                        for (let data in currency[sorted]) {
+                            for (selectList of currencyName) {
+                                let optionList = document.createElement('option');
+                                optionList.innerText = data.toUpperCase();
+                                optionList.value = data;
+                                selectList.appendChild(optionList);
+                                if (selectList.name == 'From' && data == 'pkr') { optionList.selected = 'selected' }
+                                else if (selectList.name == 'To' && data == 'kwd') { optionList.selected = 'selected' }
+                                selectList.addEventListener('change', (e) => {
+                                    updateFlag(e.target);
+                                });
+                            };
+                        };
+
+                    };
+                };
+            });
+
+        let updateFlag = (element) => {
+            let countryCode = element.value.toUpperCase().slice(0, 2);
+            let img = element.parentElement.querySelectorAll('img')[0];
+            img.src = `https://flagsapi.com/${countryCode}/flat/64.png`;
+        };
+
+        currencybtn.addEventListener('click', async (e) => {
+            e.preventDefault();
+            let toRate;
+            let toCurrency = await fetch(`https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@latest/v1/currencies/${currencyName[1].value}.json`);
+            let toValue = await toCurrency.json();
+            for (let num in toValue) { toRate = toValue[num][currencyName[0].value]; };
+            if (inputValue.value == "" || inputValue.value < 1) { inputValue.value = 1; } else {
+                result.innerText = `${inputValue.value} ${currencyName[1].value.toUpperCase()} is equal to
+         ${inputValue.value * toRate}  ${currencyName[0].value.toUpperCase()}`;
+            };
+        });
+    </script>
+</body>
+
+</html>
